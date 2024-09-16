@@ -1,0 +1,28 @@
+---
+# Enable IPTABLES
+- block:
+    - name: Enable and start iptables
+      ansible.builtin.service:
+        name: nftables
+        enabled: true
+        state: started
+
+    - name: Add port 22/tcp & 123/ntp to the public zone
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+        zone: public
+      loop:
+        - 22/tcp      # for ssh
+        - 123/tcp     # for ntp
+
+    - name: Reload firewalld to apply changes
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
+      
+        
+        # Need to check use of nftables instead of iptables
+        # Need to ensure firewalld service is already started ,
+        # Port we can add in loop.

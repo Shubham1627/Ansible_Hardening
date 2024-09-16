@@ -1,0 +1,21 @@
+---
+# Reviewing inittab and boot scripts
+- block:
+    - name: Getting current default runlevel
+      ansible.builtin.shell: systemctl get-default
+      register: curr_runlevel
+    
+    - name: Set default runlevel to multi-user
+      ansible.builtin.command: systemctl set-default multi-user.target
+
+    - name: Pause for a moment to allow changes to take effect
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Verify default target is set to multi-user
+      ansible.builtin.shell: systemctl get-default
+      register: post_runlevel
+
+    - name: Debug output
+      ansible.builtin.debug:
+        msg: "Before: {{ curr_runlevel.stdout }} After: {{ post_runlevel.stdout }}"

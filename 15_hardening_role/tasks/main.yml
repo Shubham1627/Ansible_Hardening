@@ -1,0 +1,16 @@
+---
+# Enable SELINUX
+- block:
+    - name: Ensure SELINUX is set to enforcing
+      ansible.builtin.lineinfile:
+        path: /etc/sysconfig/selinux
+        regexp: '^SELINUX='
+        line: 'SELINUX=enforcing'
+        state: present
+
+    - name: Ensure SELINUXTYPE is set to targeted
+      ansible.builtin.lineinfile:
+        path: /etc/sysconfig/selinux
+        regexp: '^SELINUXTYPE='
+        line: 'SELINUXTYPE=targeted'
+        state: present

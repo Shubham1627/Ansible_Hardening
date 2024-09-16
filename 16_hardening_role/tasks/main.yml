@@ -1,0 +1,133 @@
+---
+# Securing SSh
+- block:
+    - name: Comment SFTP subsystem file
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^Subsystem\s+sftp\s+/usr/libexec/openssh/sftp-server'
+        line: '#Subsystem     sftp     /usr/libexec/openssh/sftp-server'
+        state: present
+        backup: yes
+
+    - name: Restrict Root login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin\s+'
+        line: 'PermitRootLogin no'
+        state: present
+        backup: yes
+
+    - name: UsePrivilegeSeparation yes
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^UsePrivilegeSeparation\s+'
+        line: 'UsePrivilegeSeparation yes'
+        state: present
+        backup: yes
+
+    - name: Protocol 2
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^Protocol\s+'
+        line: 'Protocol 2'
+        state: present
+        backup: yes
+
+    - name: LogLevel verbose
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^LogLevel\s+'
+        line: 'LogLevel verbose'
+        state: present
+        backup: yes
+
+    - name: Banner /etc/issue
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^Banner\s+'
+        line: 'Banner /etc/issue'
+        state: present
+        backup: yes
+
+    - name: AllowTcpForwarding
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AllowTcpForwarding\s+'
+        line: 'AllowTcpForwarding no'
+        state: present
+        backup: yes
+
+    - name: X11Forwarding no
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^X11Forwarding\s+'     
+        line: 'X11Forwarding no'
+        state: present
+        backup: yes
+
+    - name: StrictModes yes
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^StrictModes\s+'     
+        line: 'StrictModes yes'
+        state: present
+        backup: yes
+    
+    - name: IgnoreRhosts
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^IgnoreRhosts\s+'
+        line: 'IgnoreRhosts yes'
+        state: present
+        backup: yes
+
+    - name: HostbasedAuthentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^HostbasedAuthentication\s+'     
+        line: 'HostbasedAuthentication no'
+        state: present
+        backup: yes
+
+    - name: RhostsRSAAuthentication no
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^RhostsRSAAuthentication\s+'
+        line: 'RhostsRSAAuthentication no'
+        state: present
+        backup: yes
+
+    - name: Permit Empty password no
+      ansible.builtin.lineinfile:         
+        path: /etc/ssh/sshd_config        
+        regexp: '^PermitEmptyPasswords\s+'
+        line: 'PermitEmptyPasswords no'
+        state: present                    
+        backup: yes
+
+
+    - name: Restart service sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
+    
+
+    # This is incomplete playbook last three parameters are need to add according to Exel sheet.
+    # KexAlgorithm
+    # HostKeyAlgorithm
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

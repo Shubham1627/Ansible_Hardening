@@ -1,0 +1,16 @@
+---
+# Remove CTRL+ALT+DEL trap Entry
+- block:
+    - name: Remove existing ctrl-alt-del.target symlink (if-any)
+      ansible.builtin.file:
+        path: /etc/systemd/system/ctrl-alt-del.target
+        state: absent
+      ignore_errors: yes
+      register: remove_symlink
+ 
+    - name: Mask ctrl-alt-del.target to disable reboot
+      ansible.builtin.systemd:
+        name: ctrl-alt-del.target
+        masked: true
+      when: remove_symlink is succeeded
+
