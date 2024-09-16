@@ -1,0 +1,113 @@
+---
+# Kernel Tunable security parameters.
+- name: Enable TCP SYN Cookie Protection
+  ansible.posix.sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Enable IP Spoofing Protection
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.all.rp_filter
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Enable Ignoring Brodcasts Request
+  ansible.posix.sysctl:
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Enable Bad Error Message Protection
+  ansible.posix.sysctl:
+    name: net.ipv4.icmp_ignore_bogus_error_responses
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Log Invalid Addressess ( Martian Packets )
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.all.log_martians
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable IP forwarding ( ipv4 )
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '0'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable IP forwarding ( ipv6 )
+  ansible.posix.sysctl:      
+    name: net.ipv6.conf.all.forwarding    # check for ipv4
+    value: '0' 
+    sysctl_set: yes          
+    state: present 
+    reload: yes   
+
+- name: Disable IP Source Routing 
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.all.accept_source_route
+    value: '0'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable ICMP Redirect ( ipv4 )
+  ansible.posix.sysctl:                         
+    name: net.ipv4.conf.all.accept_redirects
+    value: '0' 
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable ICMP Redirect ( default )
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.default.accept_redirects
+    value: '0'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable Secure ICMP Redirect ( ipv4 )
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.all.secure_redirects
+    value: '0'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable Secure ICMP Redirect (default )
+  ansible.posix.sysctl:
+    name: net.ipv4.conf.default.secure_redirects
+    value: '0'
+    state: present
+    reload: yes
+
+- name: Disable IPv6 ( all )
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: 1
+    state: present
+    reload: yes
+
+- name: Disable IPv6 ( default )
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.default.disable_ipv6
+    value: 1
+    state: present
+    reload: yes
+
+- name: configure kernel parametes
+  ansible.builtin.shell: sysctl -p
