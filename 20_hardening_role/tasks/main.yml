@@ -1,0 +1,65 @@
+---
+#  Disable unwanted accounts
+
+  # 1. Lock system accounts that are not used for logins
+ - name: Get list of unlocked accounts
+   ansible.builtin.shell: "egrep -v '.*:\\*|:\\!' /etc/shadow | awk -F: '{print $1}'"
+   register: unlocked_accounts
+   changed_when: false
+
+ - name: Lock unwanted accounts (manually filter unwanted accounts)
+   ansible.builtin.user:
+     name: "{{ item }}"
+     password_lock: yes
+   loop: "{{ unlocked_accounts.stdout_lines }}"
+   when: "{{ item }} not in ['root', 'shubham']"
+
+
+  # 2. Ensure all accounts have 'x' in the password field of /etc/passwd
+ - name: Get accounts without 'x' in /etc/passwd
+   ansible.builtin.shell: "grep -v ':x:' /etc/passwd | awk -F: '{print $1}'"
+   register: non_shadowed_accounts
+   changed_when: false
+
+ - name: Fix accounts without 'x' in /etc/passwd
+   ansible.builtin.user:
+     name: "{{ item }}"
+     shell: /sbin/nologin
+   loop: "{{ non_shadowed_accounts.stdout_lines }}"
+
+  # 3. Check for unused accounts and delete them
+ - name: Find files owned by unused accounts
+   ansible.builtin.shell: "find / -path /proc -prune -o -user {{ item }} -ls"
+   register: files_owned_by_user
+   changed_when: false
+
+ - name: Delete unused accounts
+   ansible.builtin.user:
+     name: "{{ item }}"
+     state: absent
+     remove: yes
+   when: files_owned_by_user.stdout == ""
+   loop: "{{ unused_accounts }}"
+
+
+   # 4. Ensure single-user mode is password protected by the root password
+    - name: Check if single-user mode is password protected
+      command: "grep '^ExecStart=' /usr/lib/systemd/system/rescue.service"
+      register: rescue_service_check
+      changed_when: false
+
+    - name: Set password protection for single-user mode
+      lineinfile:
+        path: /usr/lib/systemd/system/rescue.service
+        regexp: '^ExecStart='
+        line: 'ExecStart=-/bin/sh -c "/usr/sbin/sulogin; /usr/bin/systemctl --fail --no-block default"'
+      when: rescue_service_check.stdout != 'ExecStart=-/bin/sh -c "/usr/sbin/sulogin; /usr/bin/systemctl --fail --no-block default"'
+
+    - name: Reload systemd to apply changes
+      command: systemctl daemon-reload
+      notify:
+        - Reboot
+
+  handlers:
+    - name: Reboot
+      reboot:

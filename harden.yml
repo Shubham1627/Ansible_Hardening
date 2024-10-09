@@ -1,5 +1,6 @@
 ---
 - name: Ansible hardening tasks
   hosts: all
+  gather_facts: no
   roles:
-    - 17_hardening_role 
+    - 19_hardening_role 

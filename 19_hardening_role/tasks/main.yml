@@ -1,0 +1,28 @@
+---
+# Restricting access to root account
+  - name: Ensure /root directory has 700 permissions
+    ansible.builtin.file:
+      path: /root
+      mode: '0700'
+      state: directory
+      owner: root
+      group: root
+
+  - name: Add "console" to /etc/securetty
+    ansible.builtin.lineinfile:
+      path: /etc/security
+      line: console
+      state: present
+
+  - name: Add "tty1" to /etc/securetty
+    ansible.builtin.lineinfile:
+      path: /etc/securetty
+      line: tty1
+      state: present
+
+  - name: Add "tty2" to /etc/securetty
+    ansible.builtin.lineinfile:
+      path: /etc/securetty
+      line: tty2
+      state: present
+

@@ -1,0 +1,50 @@
+---
+# Check file permissions and ownership
+- name: Set umask in /etc/bashrc and /etc/profile
+  ansible.builtin.lineinfile:
+    path: "{{ item }}"
+    line: "umask 022"
+    create: yes
+    state: present
+  loop:
+    - /etc/bashrc
+    - /etc/profile
+
+- name: Find and report SUID files
+  ansible.builtin.command: find / -path /proc -prune -o -type f -perm /u=s
+  register: suid_files
+  ignore_errors: true
+- ansible.builtin.debug:
+    var: suid_files.stdout_lines
+
+- name: Find and report SGID files
+  ansible.builtin.command: find / -path /proc -prune -o -type f -perm /g=s
+  register: sgid_files
+  ignore_errors: true
+- ansible.builtin.debug:     
+    var: sgid_files.stdout_lines
+
+- name: Find and report world-writable files
+  ansible.builtin.command: find / -path /proc -prune -o -type f -perm -o+w
+  register: world_writable_files
+  ignore_errors: true
+- ansible.builtin.debug:     
+    var: world_writable_files.stdout_lines
+
+
+- name: Find and report world-writable directories
+  ansible.builtin.command: find / -path /proc -prune -o -type d -perm -o+w
+  register: world_writable_dirs
+  ignore_errors: true
+- ansible.builtin.debug:     
+    var: world_writable_dirs.stdout_lines
+
+- name: Find unowned files
+  ansible.builtin.command: find / -nouser -o -nogroup
+  register: unowned_files
+  ignore_errors: true
+- ansible.builtin.debug:     
+    var: unowned_files.stdout_lines
+
+# Unable to get all files due to permission, need to verify it is sufficient or not.
+# Make use of ignore error.
